@@ -136,6 +136,9 @@ ENV/
 env.bak/
 venv.bak/
 
+# auth
+*.htpass
+
 # Spyder project settings
 .spyderproject
 .spyproject
