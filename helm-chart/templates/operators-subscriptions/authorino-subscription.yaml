@@ -1,11 +1,16 @@
 apiVersion: operators.coreos.com/v1alpha1
 kind: Subscription
 metadata:
-  name: servicemeshoperator
+  name: authorino-operator
   namespace: openshift-operators
+  annotations:
+    helm.sh/hook: pre-install
+    helm.sh/hook-weight: "1" 
+    helm.sh/hook-delete-policy: before-hook-creation
 spec:
   channel: stable
   installPlanApproval: Automatic
-  name: servicemeshoperator
+  name: authorino-operator
   source: redhat-operators
   sourceNamespace: openshift-marketplace
+  # startingCSV: authorino-operator.v1.0.1

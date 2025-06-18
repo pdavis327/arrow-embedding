@@ -1,0 +1,41 @@
+# templates/nfd-operator-preinstall-hook.yaml
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: openshift-nfd
+  annotations:
+    helm.sh/hook: pre-install
+    helm.sh/hook-weight: "1" # Ensures this runs early among pre-install hooks
+    helm.sh/hook-delete-policy: before-hook-creation
+    openshift.io/display-name: "Node Feature Discovery Operator"
+  labels:
+    openshift.io/cluster-monitoring: 'true'
+---
+apiVersion: operators.coreos.com/v1
+kind: OperatorGroup
+metadata:
+  name: nfd
+  namespace: openshift-nfd
+  annotations:
+    helm.sh/hook: pre-install
+    helm.sh/hook-weight: "2" # Runs after Namespace
+    helm.sh/hook-delete-policy: before-hook-creation
+spec:
+  targetNamespaces:
+    - openshift-nfd
+---
+apiVersion: operators.coreos.com/v1alpha1
+kind: Subscription
+metadata:
+  name: nfd
+  namespace: openshift-nfd
+  annotations:
+    helm.sh/hook: pre-install
+    helm.sh/hook-weight: "3" # Runs after OperatorGroup
+    helm.sh/hook-delete-policy: before-hook-creation
+spec:
+  channel: stable
+  name: nfd
+  source: redhat-operators
+  sourceNamespace: openshift-marketplace
+  installPlanApproval: Automatic
