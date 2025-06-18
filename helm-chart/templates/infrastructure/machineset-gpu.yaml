@@ -7,22 +7,22 @@ metadata:
     machine.openshift.io/memoryMb: "65536"
     machine.openshift.io/vCPU: "16"
   labels:
-    machine.openshift.io/cluster-api-cluster: cluster-9bst5-chmgn
-  name: cluster-9bst5-chmgn-worker-us-east-2a-gpu
+    machine.openshift.io/cluster-api-cluster: cluster-fnz4x-4tn9j
+  name: cluster-fnz4x-4tn9j-worker-us-east-2a-gpu
   namespace: openshift-machine-api
 spec:
   replicas: {{.Values.GPU_REPLICAS}}
   selector:
     matchLabels:
-      machine.openshift.io/cluster-api-cluster: cluster-9bst5-chmgn
-      machine.openshift.io/cluster-api-machineset: cluster-9bst5-chmgn-worker-us-east-2a-gpu
+      machine.openshift.io/cluster-api-cluster: cluster-fnz4x-4tn9j
+      machine.openshift.io/cluster-api-machineset: cluster-fnz4x-4tn9j-worker-us-east-2a-gpu
   template:
     metadata:
       labels:
-        machine.openshift.io/cluster-api-cluster: cluster-9bst5-chmgn
+        machine.openshift.io/cluster-api-cluster: cluster-fnz4x-4tn9j
         machine.openshift.io/cluster-api-machine-role: worker
         machine.openshift.io/cluster-api-machine-type: worker
-        machine.openshift.io/cluster-api-machineset: cluster-9bst5-chmgn-worker-us-east-2a-gpu
+        machine.openshift.io/cluster-api-machineset: cluster-fnz4x-4tn9j-worker-us-east-2a-gpu
     spec:
       lifecycleHooks: {}
       metadata: {}
@@ -44,7 +44,7 @@ spec:
             name: aws-cloud-credentials
           deviceIndex: 0
           iamInstanceProfile:
-            id: cluster-9bst5-chmgn-worker-profile
+            id: cluster-fnz4x-4tn9j-worker-profile
           instanceType: {{.Values.GPU_TYPE_AWS}}
           kind: AWSMachineProviderConfig
           metadata:
@@ -56,30 +56,30 @@ spec:
           - filters:
             - name: tag:Name
               values:
-              - cluster-9bst5-chmgn-node
+              - cluster-fnz4x-4tn9j-node
           - filters:
             - name: tag:Name
               values:
-              - cluster-9bst5-chmgn-lb
+              - cluster-fnz4x-4tn9j-lb
           subnet:
             filters:
             - name: tag:Name
               values:
-              - cluster-9bst5-chmgn-subnet-private-us-east-2a
+              - cluster-fnz4x-4tn9j-subnet-private-us-east-2a
           tags:
-          - name: kubernetes.io/cluster/cluster-9bst5-chmgn
+          - name: kubernetes.io/cluster/cluster-fnz4x-4tn9j
             value: owned
           - name: Stack
-            value: project ocp4-cluster-9bst5
+            value: project ocp4-cluster-fnz4x
           - name: env_type
             value: ocp4-cluster
           - name: guid
-            value: 9bst5
+            value: fnz4x
           - name: owner
             value: unknown
           - name: platform
             value: RHPDS
           - name: uuid
-            value: 124b4f08-6d71-56ab-803b-24e2c818cc5c
+            value: 3ccecb55-3c86-5e1b-ae40-55851d06263e
           userDataSecret:
             name: worker-user-data

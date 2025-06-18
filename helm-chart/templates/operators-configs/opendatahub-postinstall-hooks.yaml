@@ -1,0 +1,67 @@
+apiVersion: datasciencecluster.opendatahub.io/v1
+kind: DataScienceCluster
+metadata:
+  name: default-dsc
+  annotations:
+    helm.sh/hook: post-install
+    helm.sh/hook-weight: "3" # Adjust weight based on desired order relative to other post-install hooks (e.g., NFD instance, GPU ClusterPolicy)
+    helm.sh/hook-delete-policy: before-hook-creation
+spec:
+  components:
+    codeflare:
+      managementState: Managed
+    kserve:
+      serving:
+        ingressGateway:
+          certificate:
+            type: SelfSigned
+        managementState: Managed
+        name: knative-serving
+      managementState: Managed
+    ray:
+      managementState: Managed
+    kueue:
+      managementState: Managed
+    workbenches:
+      managementState: Managed
+    dashboard:
+      managementState: Managed
+    modelmeshserving:
+      managementState: Managed
+    datasciencepipelines:
+      managementState: Managed
+    trainingoperator:
+      managementState: Removed
+---
+apiVersion: dashboard.opendatahub.io/v1
+kind: AcceleratorProfile
+metadata:
+  name: migrated-gpu
+  namespace: redhat-ods-applications
+  annotations:
+    helm.sh/hook: post-install
+    helm.sh/hook-weight: "4" 
+    helm.sh/hook-delete-policy: before-hook-creation
+spec:
+  displayName: NVIDIA GPU
+  enabled: true
+  identifier: nvidia.com/gpu
+  tolerations:
+    - effect: NoSchedule
+      key: nvidia.com/gpu
+      operator: Exists
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: odh-segment-key-config
+  namespace: redhat-ods-applications
+  labels:
+    app.kubernetes.io/part-of: segment-io
+    app.opendatahub.io/segment-io: 'true'
+  annotations:
+    helm.sh/hook: post-install
+    helm.sh/hook-weight: "5" 
+    helm.sh/hook-delete-policy: before-hook-creation
+data:
+  segmentKeyEnabled: 'false'
