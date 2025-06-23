@@ -1,2 +1,0 @@
-GPU_TYPE_AWS: 'g6e.4xlarge'
-GPU_REPLICAS: 1
