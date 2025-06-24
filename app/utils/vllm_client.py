@@ -3,7 +3,10 @@ import httpx
 from openai import OpenAI, APIError
 from typing import List, Optional
 
-def create_vllm_client(endpoint: str, model: str, api_key: Optional[str] = None) -> Optional[OpenAI]:
+
+def create_vllm_client(
+    endpoint: str, model: str, api_key: Optional[str] = None
+) -> Optional[OpenAI]:
     """
     Creates and configures an OpenAI client to connect to a vLLM endpoint.
 
@@ -24,7 +27,7 @@ def create_vllm_client(endpoint: str, model: str, api_key: Optional[str] = None)
     # The OpenAI client's `base_url` should point to the versioned API path.
     # vLLM's OpenAI-compatible server typically serves from `/v1`.
     base_url = f"{endpoint.rstrip('/')}/v1"
-    
+
     try:
         # --- Instantiate the OpenAI client ---
         # The `httpx.Client` is used to disable SSL certificate verification (`verify=False`),
@@ -32,7 +35,8 @@ def create_vllm_client(endpoint: str, model: str, api_key: Optional[str] = None)
         # that use self-signed certificates.
         client = OpenAI(
             base_url=base_url,
-            api_key=api_key or "not-needed", # API key is required, but can be any string if not used
+            api_key=api_key
+            or "not-needed",  # API key is required, but can be any string if not used
             http_client=httpx.Client(verify=False),
         )
         return client
@@ -41,7 +45,9 @@ def create_vllm_client(endpoint: str, model: str, api_key: Optional[str] = None)
         return None
 
 
-def get_embeddings(client: OpenAI, texts: List[str], model_name: str) -> Optional[List[List[float]]]:
+def get_embeddings(
+    client: OpenAI, texts: List[str], model_name: str
+) -> Optional[List[List[float]]]:
     """
     Generates embeddings for a list of texts using the provided OpenAI client.
 
@@ -56,20 +62,18 @@ def get_embeddings(client: OpenAI, texts: List[str], model_name: str) -> Optiona
     if not texts:
         print("Warning: Input text list is empty. Returning None.")
         return None
-        
+
     try:
         # --- Call the embeddings API ---
         # The client library handles building the request and parsing the response.
         response = client.embeddings.create(
-            model=model_name,
-            input=texts,
-            encoding_format="float"
+            model=model_name, input=texts, encoding_format="float"
         )
-        
+
         # --- Extract the embedding vectors from the response object ---
         embeddings = [item.embedding for item in response.data]
         return embeddings
-            
+
     except APIError as e:
         # Handle API-specific errors from the OpenAI library
         print(f"An API error occurred: {e}")

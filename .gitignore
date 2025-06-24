@@ -11,7 +11,7 @@ __pycache__/
 .env
 
 # data
-*.csv
+# *.csv
 # Distribution / packaging
 .Python
 build/
