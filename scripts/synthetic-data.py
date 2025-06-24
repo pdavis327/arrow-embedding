@@ -1,5 +1,3 @@
-
-
 # 1.  **`countries` Dictionary:** Defines each target country along with lists of adjectives, component types, and specifications commonly associated with their electronics manufacturing. This helps inject subtle "signals" into the descriptions.
 # 2.  **Random Selection:** For each sample, it randomly picks a country, then randomly selects an adjective, component, and specification from that country's defined characteristics.
 # 3.  **Description Templates:** It uses a few basic sentence structures to combine these elements.
@@ -8,6 +6,7 @@
 
 import pandas as pd
 import random
+
 
 def generate_synthetic_electronics_data(num_samples=500):
     """
@@ -24,45 +23,177 @@ def generate_synthetic_electronics_data(num_samples=500):
     # Define possible countries of origin and their associated typical characteristics/products
     countries = {
         "China": {
-            "adjectives": ["cost-effective", "high-volume", "standard", "reliable", "mass-produced"],
-            "components": ["resistor", "capacitor", "LED", "diode", "transistor", "connector", "PCB", "power supply", "relay"],
-            "specs": ["SMD", "through-hole", "general purpose", "consumer grade", "industrial standard"]
+            "adjectives": [
+                "cost-effective",
+                "high-volume",
+                "standard",
+                "reliable",
+                "mass-produced",
+            ],
+            "components": [
+                "resistor",
+                "capacitor",
+                "LED",
+                "diode",
+                "transistor",
+                "connector",
+                "PCB",
+                "power supply",
+                "relay",
+            ],
+            "specs": [
+                "SMD",
+                "through-hole",
+                "general purpose",
+                "consumer grade",
+                "industrial standard",
+            ],
         },
         "USA": {
-            "adjectives": ["high-performance", "military-grade", "aerospace", "specialized", "innovative", "rugged"],
-            "components": ["microcontroller", "FPGA", "ASIC", "sensor", "analog IC", "power management IC", "RF module"],
-            "specs": ["low-power", "high-speed", "customizable", "automotive-grade", "space-grade"]
+            "adjectives": [
+                "high-performance",
+                "military-grade",
+                "aerospace",
+                "specialized",
+                "innovative",
+                "rugged",
+            ],
+            "components": [
+                "microcontroller",
+                "FPGA",
+                "ASIC",
+                "sensor",
+                "analog IC",
+                "power management IC",
+                "RF module",
+            ],
+            "specs": [
+                "low-power",
+                "high-speed",
+                "customizable",
+                "automotive-grade",
+                "space-grade",
+            ],
         },
         "Japan": {
-            "adjectives": ["high-precision", "miniature", "automotive-grade", "ultra-low power", "reliable", "cutting-edge"],
-            "components": ["capacitor (ceramic/tantalum)", "inductor", "sensor (hall effect, pressure)", "crystal oscillator", "LCD driver", "camera module"],
-            "specs": ["compact", "high-frequency", "low-ESR", "long-life", "optical"]
+            "adjectives": [
+                "high-precision",
+                "miniature",
+                "automotive-grade",
+                "ultra-low power",
+                "reliable",
+                "cutting-edge",
+            ],
+            "components": [
+                "capacitor (ceramic/tantalum)",
+                "inductor",
+                "sensor (hall effect, pressure)",
+                "crystal oscillator",
+                "LCD driver",
+                "camera module",
+            ],
+            "specs": ["compact", "high-frequency", "low-ESR", "long-life", "optical"],
         },
         "South Korea": {
-            "adjectives": ["advanced", "high-density", "consumer electronics", "next-gen", "high-bandwidth"],
-            "components": ["memory IC (DRAM, NAND)", "display driver IC", "OLED panel", "processor", "power semiconductor"],
-            "specs": ["mobile-optimized", "high-resolution", "fast-charging", "compact design"]
+            "adjectives": [
+                "advanced",
+                "high-density",
+                "consumer electronics",
+                "next-gen",
+                "high-bandwidth",
+            ],
+            "components": [
+                "memory IC (DRAM, NAND)",
+                "display driver IC",
+                "OLED panel",
+                "processor",
+                "power semiconductor",
+            ],
+            "specs": [
+                "mobile-optimized",
+                "high-resolution",
+                "fast-charging",
+                "compact design",
+            ],
         },
         "Germany": {
-            "adjectives": ["industrial-grade", "robust", "precision-engineered", "high-quality", "automotive-certified"],
-            "components": ["sensor (industrial)", "connector (heavy duty)", "relay (industrial)", "power module", "test equipment components"],
-            "specs": ["harsh environment", "high voltage", "certified", "safety-critical"]
+            "adjectives": [
+                "industrial-grade",
+                "robust",
+                "precision-engineered",
+                "high-quality",
+                "automotive-certified",
+            ],
+            "components": [
+                "sensor (industrial)",
+                "connector (heavy duty)",
+                "relay (industrial)",
+                "power module",
+                "test equipment components",
+            ],
+            "specs": [
+                "harsh environment",
+                "high voltage",
+                "certified",
+                "safety-critical",
+            ],
         },
         "Taiwan": {
-            "adjectives": ["leading-edge", "foundry-produced", "chipset", "integrated", "innovative"],
-            "components": ["microcontroller", "logic IC", "power management IC", "network IC", "display panel components", "passive components"],
-            "specs": ["IoT-ready", "AI-enabled", "high-integration", "wireless", "compact"]
+            "adjectives": [
+                "leading-edge",
+                "foundry-produced",
+                "chipset",
+                "integrated",
+                "innovative",
+            ],
+            "components": [
+                "microcontroller",
+                "logic IC",
+                "power management IC",
+                "network IC",
+                "display panel components",
+                "passive components",
+            ],
+            "specs": [
+                "IoT-ready",
+                "AI-enabled",
+                "high-integration",
+                "wireless",
+                "compact",
+            ],
         },
         "Vietnam": {
-            "adjectives": ["assembly", "cost-efficient", "growing production", "consumer electronics"],
-            "components": ["cable assembly", "wiring harness", "simple PCB assembly", "LED light modules", "power adapters"],
-            "specs": ["manual assembly", "sub-assembly", "volume production"]
+            "adjectives": [
+                "assembly",
+                "cost-efficient",
+                "growing production",
+                "consumer electronics",
+            ],
+            "components": [
+                "cable assembly",
+                "wiring harness",
+                "simple PCB assembly",
+                "LED light modules",
+                "power adapters",
+            ],
+            "specs": ["manual assembly", "sub-assembly", "volume production"],
         },
         "Malaysia": {
-            "adjectives": ["OSAT (assembly & test)", "discrete component", "semiconductor packaging", "high-volume"],
-            "components": ["transistor", "diode", "op-amp", "standard logic IC", "sensor assembly"],
-            "specs": ["reliable packaging", "component-level", "automotive assembly"]
-        }
+            "adjectives": [
+                "OSAT (assembly & test)",
+                "discrete component",
+                "semiconductor packaging",
+                "high-volume",
+            ],
+            "components": [
+                "transistor",
+                "diode",
+                "op-amp",
+                "standard logic IC",
+                "sensor assembly",
+            ],
+            "specs": ["reliable packaging", "component-level", "automotive assembly"],
+        },
     }
 
     data = []
@@ -83,7 +214,7 @@ def generate_synthetic_electronics_data(num_samples=500):
             f"{adjective} {component}, {spec}.",
             f"A {spec} {component} for {adjective} applications.",
             f"{component} ({adjective}) with {spec} features.",
-            f"Manufactured for {adjective} needs: {component} with {spec}."
+            f"Manufactured for {adjective} needs: {component} with {spec}.",
         ]
 
         # Add more specific details based on component type
@@ -100,29 +231,35 @@ def generate_synthetic_electronics_data(num_samples=500):
             part_details = f" {random.choice(['USB Type-C', 'HDMI', 'board-to-board'])} {random.choice(['20-pin', '4-pin', 'high-density'])}."
         elif "sensor" in component:
             part_details = f" {random.choice(['temperature', 'pressure', 'accelerometer'])} {random.choice(['digital output', 'analog output', 'I2C interface'])}."
-        elif "IC" in component: # For Integrated Circuits (analog, logic, power management)
-             part_details = f" {random.choice(['op-amp', 'voltage regulator', 'logic gate'])} {random.choice(['SOIC-8', 'QFN-16', 'DIP-14'])}."
+        elif (
+            "IC" in component
+        ):  # For Integrated Circuits (analog, logic, power management)
+            part_details = f" {random.choice(['op-amp', 'voltage regulator', 'logic gate'])} {random.choice(['SOIC-8', 'QFN-16', 'DIP-14'])}."
         elif "transistor" in component:
-             part_details = f" {random.choice(['NPN BJT', 'MOSFET', 'IGBT'])} {random.choice(['TO-220', 'SOT-23'])}."
+            part_details = f" {random.choice(['NPN BJT', 'MOSFET', 'IGBT'])} {random.choice(['TO-220', 'SOT-23'])}."
         elif "inductor" in component:
-             part_details = f" {random.choice(['10uH', '100uH', '1mH'])} {random.choice(['SMD power inductor', 'ferrite core'])}."
-
+            part_details = f" {random.choice(['10uH', '100uH', '1mH'])} {random.choice(['SMD power inductor', 'ferrite core'])}."
 
         part_description = random.choice(description_templates) + part_details.strip()
-        data.append({"Part_Description": part_description, "Country_Of_Origin": country_of_origin})
+        data.append(
+            {
+                "Part_Description": part_description,
+                "Country_Of_Origin": country_of_origin,
+            }
+        )
 
     df = pd.DataFrame(data)
     return df
 
+
 if __name__ == "__main__":
 
     # Generate a dataset with n samples
-    synthetic_df = generate_synthetic_electronics_data(num_samples=500)
+    synthetic_df = generate_synthetic_electronics_data(num_samples=1000)
     print(synthetic_df.head())
     print("\nDataset Info:")
     print(synthetic_df.info())
     print("\nCountry Distribution:")
-    print(synthetic_df['Country_Of_Origin'].value_counts())
+    print(synthetic_df["Country_Of_Origin"].value_counts())
 
-    synthetic_df.to_csv("../data/datasynthetic_electronics_parts.csv", index=False)
-
+    synthetic_df.to_csv("../data/synthetic_electronics_parts_1k.csv", index=False)
