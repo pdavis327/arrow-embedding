@@ -310,6 +310,127 @@ def evaluate_model(
     print("Evaluation complete - results saved to MinIO outputs folder")
 
 
+@component(
+    base_image="registry.redhat.io/ubi8/python-39:latest",
+    packages_to_install=[
+        "pandas",
+        "numpy",
+        "scikit-learn",
+        "joblib",
+        "requests",
+        "boto3",
+    ],
+)
+def predict_on_unseen_data(
+    trained_model: Input[Model],
+    label_encoder: Input[Model],
+    minio_endpoint: str,
+    minio_access_key: str,
+    minio_secret_key: str,
+    bucket_name: str,
+    unseen_data_filename: str,
+    predictions_output_filename: str,
+    endpoint: str,
+    embedding_model: str,
+    api_key: str,
+):
+    """Load unseen data, generate embeddings, make predictions, and save results to MinIO"""
+    import pandas as pd
+    import numpy as np
+    import pickle
+    import joblib
+    import requests
+    import json
+    import boto3
+
+    # Setup MinIO client
+    s3_client = boto3.client(
+        "s3",
+        endpoint_url=minio_endpoint,
+        aws_access_key_id=minio_access_key,
+        aws_secret_access_key=minio_secret_key,
+        verify=False,
+    )
+
+    # Download unseen data from MinIO
+    local_data_path = "/tmp/unseen_data.csv"
+    s3_client.download_file(
+        bucket_name, f"data/{unseen_data_filename}", local_data_path
+    )
+
+    # Load the unseen data
+    df = pd.read_csv(local_data_path)
+    print(f"Loaded {len(df)} unseen records for prediction")
+    print(f"Columns: {list(df.columns)}")
+
+    # Extract descriptions for embedding generation
+    descriptions_list = df["Part_Description"].tolist()
+    print(f"Generating embeddings for {len(descriptions_list)} descriptions...")
+
+    # Generate embeddings via API call
+    headers = {"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"}
+    embeddings_list = []
+
+    for desc in descriptions_list:
+        payload = {"model": embedding_model, "input": desc}
+
+        response = requests.post(
+            f"{endpoint}/v1/embeddings", headers=headers, json=payload, verify=False
+        )
+
+        if response.status_code == 200:
+            result = response.json()
+            embedding = result["data"][0]["embedding"]
+            embeddings_list.append(embedding)
+        else:
+            print(f"Error generating embedding: {response.status_code}")
+            raise Exception(f"Failed to generate embedding for: {desc[:50]}...")
+
+    if not embeddings_list:
+        raise Exception("Failed to generate embeddings for unseen data")
+
+    X_unseen = np.array(embeddings_list)
+    print(f"Generated embeddings with shape: {X_unseen.shape}")
+
+    # Load trained model and label encoder
+    knn_model = joblib.load(trained_model.path)
+
+    with open(label_encoder.path, "rb") as f:
+        label_encoder_obj = pickle.load(f)
+
+    # Make predictions
+    print("Making predictions...")
+    y_pred_encoded = knn_model.predict(X_unseen)
+    y_pred_labels = label_encoder_obj.inverse_transform(y_pred_encoded)
+
+    # Get prediction probabilities/distances for confidence scoring
+    distances, _ = knn_model.kneighbors(X_unseen)
+    confidence_scores = 1 / (
+        1 + distances.mean(axis=1)
+    )  # Convert distances to confidence scores
+
+    print(f"Predictions complete for {len(y_pred_labels)} samples")
+
+    # Create predictions dataframe
+    predictions_df = df.copy()
+    predictions_df["Predicted_Country_Of_Origin"] = y_pred_labels
+    predictions_df["Confidence_Score"] = confidence_scores
+
+    # Save predictions locally first
+    local_predictions_path = "/tmp/predictions.csv"
+    predictions_df.to_csv(local_predictions_path, index=False)
+
+    # Upload predictions to MinIO
+    s3_client.upload_file(
+        local_predictions_path, bucket_name, f"data/{predictions_output_filename}"
+    )
+
+    print(f"Predictions saved to MinIO: data/{predictions_output_filename}")
+    print(f"Predicted countries distribution:")
+    for country, count in pd.Series(y_pred_labels).value_counts().head(10).items():
+        print(f"   - {country}: {count}")
+
+
 @pipeline(
     name="electronics-embedding-pipeline",
     description="Electronics parts country of origin prediction using BGE-Large embeddings",
@@ -323,6 +444,8 @@ def electronics_embedding_pipeline(
     endpoint: str = "",
     embedding_model: str = "",
     api_key: str = "",
+    unseen_data_filename: str = "unseen_electronics_parts.csv",
+    predictions_output_filename: str = "predictions_output.csv",
 ):
     """Main pipeline for electronics parts classification"""
 
@@ -358,6 +481,21 @@ def electronics_embedding_pipeline(
         minio_access_key=minio_access_key,
         minio_secret_key=minio_secret_key,
         bucket_name=bucket_name,
+    )
+
+    # Step 5: Make predictions on unseen data
+    predict_task = predict_on_unseen_data(
+        trained_model=train_task.outputs["trained_model"],
+        label_encoder=load_task.outputs["label_encoder"],
+        minio_endpoint=minio_endpoint,
+        minio_access_key=minio_access_key,
+        minio_secret_key=minio_secret_key,
+        bucket_name=bucket_name,
+        unseen_data_filename=unseen_data_filename,
+        predictions_output_filename=predictions_output_filename,
+        endpoint=endpoint,
+        embedding_model=embedding_model,
+        api_key=api_key,
     )
 
 
