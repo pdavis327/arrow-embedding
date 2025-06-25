@@ -1,8 +1,8 @@
-# 1.  **`countries` Dictionary:** Defines each target country along with lists of adjectives, component types, and specifications commonly associated with their electronics manufacturing. This helps inject subtle "signals" into the descriptions.
-# 2.  **Random Selection:** For each sample, it randomly picks a country, then randomly selects an adjective, component, and specification from that country's defined characteristics.
-# 3.  **Description Templates:** It uses a few basic sentence structures to combine these elements.
-# 4.  **Component-Specific Details:** It then adds more specific, randomized details based on the chosen component type (e.g., resistance values for resistors, capacitance for capacitors) to make the descriptions richer and more realistic.
-# 5.  **DataFrame Creation:** Finally, it compiles all the generated descriptions and countries into a pandas DataFrame.
+# 1. Countries Dictionary: Defines each target country along with lists of adjectives, component types, and specifications commonly associated with their electronics manufacturing. This helps inject subtle "signals" into the descriptions.
+# 2. Random Selection: For each sample, it randomly picks a country, then randomly selects an adjective, component, and specification from that country's defined characteristics.
+# 3. Description Templates: It uses a few basic sentence structures to combine these elements.
+# 4. Component-Specific Details: It then adds more specific, randomized details based on the chosen component type (e.g., resistance values for resistors, capacitance for capacitors) to make the descriptions richer and more realistic.
+# 5. DataFrame Creation: Finally, it compiles all the generated descriptions and countries into a pandas DataFrame.
 
 import pandas as pd
 import random
